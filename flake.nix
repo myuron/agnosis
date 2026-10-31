@@ -45,6 +45,7 @@
             packages = with pkgs; [
               rust-bin.stable.latest.default
               just
+              actionlint
             ];
           };
         };

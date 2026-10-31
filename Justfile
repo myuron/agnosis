@@ -9,6 +9,9 @@ check:
 lint:
   cargo clippy --all-targets
 
+ci-lint:
+  actionlint
+
 build:
   cargo build
 
