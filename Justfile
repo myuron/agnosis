@@ -7,7 +7,7 @@ check:
   cargo check
 
 lint:
-  cargo clippy
+  cargo clippy --all-targets
 
 build:
   cargo build
