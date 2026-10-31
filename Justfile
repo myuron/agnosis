@@ -16,4 +16,4 @@ test:
   cargo test
 
 run:
-  cargo run
+  cargo run -q
