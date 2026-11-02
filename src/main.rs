@@ -1,3 +1,4 @@
+use clap::{Parser, Subcommand};
 use std::env;
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader, Error};
@@ -15,6 +16,19 @@ const SKILL_MD: &str = "SKILL.md";
 const TYPE_AGENT: &str = "Agents";
 const AGENT_DIR: &str = ".claude/agents";
 
+#[derive(Parser)]
+#[command(version, about)]
+struct Args {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Output a list of files and the number of lines in each file
+    List,
+}
+
 #[derive(Tabled)]
 struct Information {
     types: String,
@@ -23,6 +37,14 @@ struct Information {
 }
 
 fn main() {
+    let args = Args::parse();
+
+    match &args.command {
+        Commands::List => list(),
+    }
+}
+
+fn list() {
     let cwd = match env::current_dir() {
         Ok(dir) => dir,
         Err(e) => {
