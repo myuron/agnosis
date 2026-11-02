@@ -39,29 +39,25 @@ struct Information {
 fn main() {
     let args = Args::parse();
 
-    match &args.command {
+    let result = match &args.command {
         Commands::List => list(),
-    }
+    };
+
+    if let Err(e) = result {
+        eprintln!("{e}");
+        std::process::exit(1);
+    };
 }
 
-fn list() {
-    let cwd = match env::current_dir() {
-        Ok(dir) => dir,
-        Err(e) => {
-            eprintln!("current directory could not be read: {e}");
-            std::process::exit(1);
-        }
-    };
+fn list() -> Result<(), Box<dyn std::error::Error>> {
+    let cwd =
+        env::current_dir().map_err(|e| format!("current directory could not be read: {e}"))?;
 
     // Count the number of lines in CLAUDE.md
     let claude_md_path = cwd.join(CLAUDE_MD);
-    let line_count = match file_line_count(&claude_md_path) {
-        Ok(lc) => lc,
-        Err(e) => {
-            eprintln!("{} could not be read: {e}", claude_md_path.display());
-            std::process::exit(1);
-        }
-    };
+    let line_count = file_line_count(&claude_md_path)
+        .map_err(|e| format!("{} could not be read: {e}", claude_md_path.display()))?;
+
     let mut rows = vec![Information {
         types: TYPE_CLAUDE_MD.into(),
         file_name: CLAUDE_MD.into(),
@@ -74,19 +70,14 @@ fn list() {
         Ok(dirs) => dirs,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Vec::new(),
         Err(e) => {
-            eprintln!("{} could not be read: {e}", skills_dir_path.display());
-            std::process::exit(1);
+            return Err(format!("{} could not be read: {e}", skills_dir_path.display()).into());
         }
     };
     for d in skills_dirs {
         let skills_md_path = skills_dir_path.join(&d).join(SKILL_MD);
-        let line_count = match file_line_count(&skills_md_path) {
-            Ok(lc) => lc,
-            Err(e) => {
-                eprintln!("{} could not be read: {e}", skills_md_path.display());
-                std::process::exit(1);
-            }
-        };
+        let line_count = file_line_count(&skills_md_path)
+            .map_err(|e| format!("{} could not be read: {e}", skills_md_path.display()))?;
+
         let row = Information {
             types: TYPE_SKILL.into(),
             file_name: d,
@@ -101,29 +92,28 @@ fn list() {
         Ok(files) => files,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Vec::new(),
         Err(e) => {
-            eprintln!("{} could not be read: {e}", agents_dir_path.display());
-            std::process::exit(1);
+            return Err(format!("{} could not be read: {e}", agents_dir_path.display()).into());
         }
     };
+
     for d in agents_dirs {
         let agents_md_path = agents_dir_path.join(&d);
-        let line_count = match file_line_count(&agents_md_path) {
-            Ok(lc) => lc,
-            Err(e) => {
-                eprintln!("{} could not be read: {e}", agents_md_path.display());
-                std::process::exit(1);
-            }
-        };
+
+        let line_count = file_line_count(&agents_md_path)
+            .map_err(|e| format!("{} could not be read: {e}", agents_md_path.display()))?;
+
         let agent_name = Path::new(&d)
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or(&d)
             .to_string();
+
         let row = Information {
             types: TYPE_AGENT.into(),
             file_name: agent_name,
             line_count,
         };
+
         rows.push(row);
     }
 
@@ -131,6 +121,8 @@ fn list() {
     let mut table = Table::new(rows);
     table.with(Style::rounded());
     println!("{table}");
+
+    Ok(())
 }
 
 fn file_line_count(file_name: &Path) -> Result<usize, Error> {
