@@ -3,8 +3,8 @@ use std::io::ErrorKind;
 use std::io::Write;
 use std::path::Path;
 
-const CONFIG_FILE: &str = "agnosis.toml";
-const INIT_CONFIG: &str = include_str!("../../assets/agnosis.toml");
+use crate::config::CONFIG_FILE;
+use crate::config::DEFAULT_CONFIG_FILE;
 
 pub fn init() -> Result<(), Box<dyn std::error::Error>> {
     let path = Path::new(CONFIG_FILE);
@@ -19,7 +19,7 @@ pub fn init() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    file.write_all(INIT_CONFIG.as_bytes())
+    file.write_all(DEFAULT_CONFIG_FILE.as_bytes())
         .map_err(|e| format!("{} could not be written: {e}", path.display()))?;
 
     println!("successfully created {}", path.display());

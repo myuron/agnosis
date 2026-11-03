@@ -1,4 +1,5 @@
 mod command;
+mod config;
 mod fs_util;
 
 use clap::{Parser, Subcommand};
@@ -16,6 +17,8 @@ enum Commands {
     Init,
     /// Output a list of files and the number of lines in each file
     List,
+    /// Run lint
+    Lint,
 }
 
 fn main() {
@@ -24,6 +27,7 @@ fn main() {
     let result = match &args.command {
         Commands::Init => command::init::init(),
         Commands::List => command::list::list(),
+        Commands::Lint => command::lint::lint(),
     };
 
     if let Err(e) = result {

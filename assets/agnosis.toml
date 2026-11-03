@@ -1,0 +1,8 @@
+[claude_md]
+max_lines = 200
+
+[skills]
+max_lines = 500
+
+[agents]
+max_lines = 200
