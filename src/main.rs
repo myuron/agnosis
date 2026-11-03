@@ -1,4 +1,5 @@
 mod command;
+mod fs_util;
 
 use clap::{Parser, Subcommand};
 
