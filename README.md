@@ -11,14 +11,14 @@
 
 ## Install
 
-```bash
+```
 # Run without installing
 nix run github:myuron/agnosis -- <command>
 ```
 
 ## Quick Start
 
-```bash
+```
 # 1. Place the configuration file.
 agnosis init
 
@@ -28,7 +28,7 @@ agnosis lint
 
 ## Command
 
-```bash
+```
 # Show help
 agnosis help
 
